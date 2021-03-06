@@ -5,6 +5,11 @@ import fr.i360matt.fastmongo.MongoIntegration;
 
 import java.util.List;
 
+/**
+ * Class test permettant à la fois de tester
+ * et servant de démonstration
+ * @author 360matt
+ */
 public class TestFastMongo {
 
     public static class Kangourou {

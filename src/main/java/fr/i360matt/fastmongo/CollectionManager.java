@@ -4,6 +4,10 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import java.lang.reflect.Field;
 
+/**
+ * Cette classe permet de gérer une collection
+ * @author 360matt
+ */
 public class CollectionManager {
 
     /**

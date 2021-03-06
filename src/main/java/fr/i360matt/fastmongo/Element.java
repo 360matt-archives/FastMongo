@@ -2,14 +2,14 @@ package fr.i360matt.fastmongo;
 
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Class représentant un object de la collection
+ * Class représentant et gérant un object de la collection
+ * @author 360matt
  */
 public final class Element {
 

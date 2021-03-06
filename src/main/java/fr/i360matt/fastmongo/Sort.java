@@ -8,6 +8,10 @@ import org.bson.conversions.Bson;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Cette classe permet d'effectuer un classement de Document par rapport à un ou plusieurs fields
+ * @author 360matt
+ */
 public final class Sort {
     public enum Direction {
         CROISSANT, DECROISSANT

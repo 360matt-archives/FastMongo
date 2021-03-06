@@ -6,9 +6,12 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-
 import java.util.Collections;
 
+/**
+ * Cette classe permet d'instancier la connexion à la base de donnée
+ * @author 360matt
+ */
 public final class MongoIntegration {
 
     protected static final ExpirableCache<String, Boolean> cache = new ExpirableCache<>(1_000);
