@@ -14,7 +14,10 @@ import java.util.concurrent.TimeUnit;
  * Cette classe permet d'établir un système de cache expirable avec le temps définis
  * Elle provient de Vivekananthan mais elle a été refaite par moi (360matt)
  *
- * @author Vivekananthan M ( https://github.com/vivekjustthink/WeakConcurrentHashMap )
+ * @author Vivekananthan M
+ * https://github.com/vivekjustthink/WeakConcurrentHashMap
+ * https://stackoverflow.com/questions/3802370/java-time-based-map-cache-with-expiring-keys
+ *
  * @author 360matt ( reformat - github.com/360matt )
  *
  * @param <K> Key Type
