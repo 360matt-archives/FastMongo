@@ -5,22 +5,22 @@ import org.bson.Document;
 import java.lang.reflect.Field;
 
 /**
- * Cette classe permet de gérer une collection
+ * This class is used to manage a collection
  * @author 360matt
  */
 public class CollectionManager {
 
     /**
-     * Permet de récupérer le manager de la collection dans le cache
-     * @param name nom de la collection
-     * @return le manager concerné
+     * Allows to retrieve the manager of the collection in the cache
+     * @param name name of the collection
+     * @return the manager concerned
      */
     public static CollectionManager getCollection (final String name) {
         if (MongoIntegration.collectionCache.containsKey(name)) {
             return MongoIntegration.collectionCache.get(name);
         } else {
             return new CollectionManager(name);
-            // s'ajoutera au cache à l'instanciation [*]
+            // will be added to the cache at instantiation  [*]
         }
     }
 
@@ -38,7 +38,7 @@ public class CollectionManager {
 
         final CollectionManager candidate = MongoIntegration.collectionCache.get(name);
         if (candidate != null) {
-            // si la collection est déjà dans le cache
+            // if the collection is already in the cache
 
             this.collection = candidate.collection;
         } else {
@@ -47,14 +47,14 @@ public class CollectionManager {
 
             this.collection = MongoIntegration.getCollect(name);
 
-            // ajout au cache statique: [*]
+            // add to static cache: [*]
             MongoIntegration.collectionCache.put(name, this);
         }
     }
 
     /**
-     * Permet d'appliquer la structure choisie sur tous les documents existants
-     * @param structure structure de donnée
+     * Allows to apply the chosen structure to all existing documents
+     * @param structure data structure class
      */
     public final void updateStructure (final Class<?> structure) {
         this.defaultTemplate = structure;
@@ -71,9 +71,9 @@ public class CollectionManager {
     }
 
     /**
-     * Permet de définir si les documents doivent être créé lorsque les éléments sont instanciés
-     * Avec le choix de la structure à appliquer
-     * @param structure la structure par défaut
+     * Allows to define whether documents should be created when elements are instantiated
+     * With the choice of the structure to be applied
+     * @param structure the default structure
      */
     public final <D> void autoInsert (final Class<D> structure) {
         this.autoInsert = true;
@@ -85,9 +85,9 @@ public class CollectionManager {
     }
 
     /**
-     * Permet de changer le nom du field qui sert d'identifiant
-     * Exemple: UUID, username, etc...
-     * @param id le nom du field
+     * Allows to change the name of the field which serves as an identifier
+     * Example: UUID, username, etc ...
+     * @param id the name of the field
      */
     public final void setFieldID (final String id) {
         this.fieldID = id;
@@ -95,10 +95,10 @@ public class CollectionManager {
 
 
     /**
-     * Permet de récupérer les données par défauts de la structure choisie
-     * @param structure structure choisie
-     * @param <D> le type de la structure
-     * @return les données de la structure (instance)
+     * Allows to recover the default data of the chosen structure
+     * @param structure chosen structure
+     * @param <D> the type of structure
+     * @return the default data of the structure (instance)
      */
     public final <D> D getEmptyRaw (final Class<D> structure) {
         if (!MongoIntegration.typeCache.containsKey(structure)) {
@@ -115,9 +115,9 @@ public class CollectionManager {
 
 
     /**
-     * Permet de convertir un Document en un Raw
-     * @param doc document d'origine
-     * @return Raw structure générée
+     * Allows to convert a Document into a Raw
+     * @param doc original document
+     * @return generated structure
      */
     public final <D> D getRawFromDocument (final Document doc, final Class<D> structure) {
         try {
@@ -137,16 +137,16 @@ public class CollectionManager {
     }
 
     /**
-     * Permet de récupérer un élément
-     * @param id identifiant de l'élément
-     * @return l'élément en question
+     * Allows to retrieve an item
+     * @param id element id
+     * @return the item in question
      */
     public final Element getObject (final String id) {
         return new Element(id, this);
     }
 
     /**
-     * Permet de verifier si un élément existe
+     * Allows to check if an element exists
      * @param id identifiant de l'élément
      * @return l'état de l'existence
      */
@@ -155,8 +155,8 @@ public class CollectionManager {
     }
 
     /**
-     * Permet de supprimer l'élément
-     * @param id identifiant de l'élément
+     * Allows to delete the item
+     * @param id element id
      */
     public final void remove (final String id) {
         collection.deleteOne(new Document(this.fieldID, id));
@@ -168,22 +168,20 @@ public class CollectionManager {
     // _________________________________________________________________________________________________________________
 
     /**
-     * Permet de créer un classement par un ou plusieurs fields
-     * @param fields fields choisies
-     * @return une instance du module de classement
+     * Allows to create a classification by one or more fields
+     * @param fields chosen fields
+     * @return an instance of the ranking module
      */
     public final Sort buildSort (final String... fields) {
-        return new Sort(this).setRule(fields);
+        return new Sort(this).ascending(fields);
     }
 
     /**
-     * Permet de créer un classement par un ou plusieurs fields
-     * @param direction l'ordre du classement
-     * @param fields fields choisies
-     * @return une instance du module de classement
+     * Allows you to create a classification by one or more fields
+     * @return an instance of the ranking module
      */
-    public final Sort buildSort (final Sort.Direction direction, final String... fields) {
-        return new Sort(this).setRule(direction, fields);
+    public final Sort buildSort () {
+        return new Sort(this);
     }
 
 

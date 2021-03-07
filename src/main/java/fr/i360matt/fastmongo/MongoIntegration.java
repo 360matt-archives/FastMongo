@@ -10,7 +10,7 @@ import org.bson.Document;
 import java.util.Collections;
 
 /**
- * Cette classe permet d'instancier la connexion à la base de donnée
+ * This class is used to instantiate the connection to the database
  * @author 360matt
  */
 public final class MongoIntegration {
@@ -31,6 +31,10 @@ public final class MongoIntegration {
         public String database;
     }
 
+    /**
+     * Allow to connect to the Mongo server
+     * @param auth All information required for connection
+     */
     public static void connect (final Auth auth) {
         final MongoCredential credential = MongoCredential.createCredential(
                 auth.user,
@@ -51,6 +55,9 @@ public final class MongoIntegration {
         setAvailable(true);
     }
 
+    /**
+     * Allow to end a connection
+     */
     public static void disconnect () {
         client.close();
         setAvailable(false);
@@ -60,16 +67,31 @@ public final class MongoIntegration {
     public static boolean isAvailable () { return isAvailable; }
     public static void setAvailable (boolean value) { isAvailable = value; }
 
-
+    /**
+     * Allows to find out if a collection exists
+     * @param name The name of the collection
+     * @return The answer about existence
+     */
     public static boolean existCollect (final String name) {
         for (final String candidate : database.listCollectionNames())
             if (candidate.equalsIgnoreCase(name))
                 return true;
         return false;
     }
+
+    /**
+     * Allows to create a collection, without error checking, you must use existCollect() before evoking this method.
+     * @param name The name of the collection to create
+     */
     public static void createCollect (final String name) {
         MongoIntegration.database.createCollection(name);
     }
+
+    /**
+     * Allows to retrieve a collection
+     * @param name The name of the collection
+     * @return the collection, can be null.
+     */
     public static MongoCollection<Document> getCollect (final String name) {
         return MongoIntegration.database.getCollection(name);
     }

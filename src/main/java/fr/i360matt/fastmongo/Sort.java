@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cette classe permet d'effectuer un classement de Document par rapport à un ou plusieurs fields
+ * This class is used to classify a Document in relation to one or more fields
  * @author 360matt
  */
 public final class Sort {
@@ -21,25 +21,46 @@ public final class Sort {
     private final CollectionManager manager;
     private int limit;
 
+    /**
+     * Allows to create a classification that can be completed later
+     * @param manager The manager of the collection where the classification is supposed to take place
+     */
     public Sort (final CollectionManager manager) {
         this.manager = manager;
     }
 
+    /**
+     * Allows to define the maximum number of results allowed at the output
+     * @param limit The number of documents to classify
+     * @return The current instance
+     */
     public final Sort setLimit (final int limit) {
         this.limit = limit;
         return this;
     }
 
-    public final Sort setRule (final String... fields) {
-        final Bson choice = Sorts.ascending(fields);
+    private Sort addRule (final boolean ascending, final String... fields) {
+        final Bson choice = (ascending) ? Sorts.ascending(fields) : Sorts.descending(fields);
         this.iter = (this.iter == null) ? manager.collection.find().sort(choice) : this.iter.sort(choice);
         return this;
     }
 
-    public final Sort setRule (final Direction direction, final String... fields) {
-        final Bson choice = (direction.equals(Direction.ASCENDING)) ? Sorts.ascending(fields) : Sorts.descending(fields);
-        this.iter = (this.iter == null) ? manager.collection.find().sort(choice) : this.iter.sort(choice);
-        return this;
+    /**
+     * Allows to add a ascending ranking rule
+     * @param fields The fields you want to add as criteria
+     * @return The current instance
+     */
+    public final Sort ascending (final String... fields) {
+        return addRule(true, fields);
+    }
+
+    /**
+     * Allows to add a descending ranking rule
+     * @param fields The fields you want to add as criteria
+     * @return The current instance
+     */
+    public final Sort descending (final String... fields) {
+        return addRule(false, fields);
     }
 
     // _________________________________________________________________________________________________________________

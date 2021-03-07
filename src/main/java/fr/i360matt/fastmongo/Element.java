@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class représentant et gérant un object de la collection
+ * Class representing and managing an object from the collection
  * @author 360matt
  */
 public final class Element {
@@ -16,6 +16,11 @@ public final class Element {
     public final String id;
     public final CollectionManager manager;
 
+    /**
+     * Allows to create an editing reference for a document (whether or not it is fictitious) so that the final document can be manipulated
+     * @param id The ID of the document you want to represent
+     * @param manager The manager of the collection where the document is supposed to be located (whether it exists or not)
+     */
     public Element (final String id, final CollectionManager manager) {
         this.id = id;
         this.manager = manager;
@@ -28,24 +33,20 @@ public final class Element {
 
 
     /**
-     * Permet de créer le document s'il n'existe pas
+     * Allows to create the document if it does not exist
      */
     protected final void defineDefaultSchema () {
         if (manager.autoInsert && manager.defaultDocument != null) {
-            // if (collection.count(new Document(manager.fieldID, id)) == 0) {
-            // si le document n'existe pas dans la collection
-
             try {
                 manager.collection.updateOne(
                         new Document(manager.fieldID, this.id),
                         new Document("$setOnInsert", manager.defaultDocument),
                         new UpdateOptions().upsert(true)
                 );
-                // update du document dans la bdd
+                // update document in DB
             } catch (final Exception e) {
                 e.printStackTrace();
             }
-            // }
         }
     }
 
@@ -53,8 +54,8 @@ public final class Element {
 
 
     /**
-     * Permet de définir des fields via un document
-     * @param document le document en question
+     * Allows to define fields via a document
+     * @param document the document in question
      */
     public final void setDocument (final Document document) {
         manager.collection.updateOne(
@@ -62,12 +63,11 @@ public final class Element {
                 new Document("$set", document),
                 new UpdateOptions().upsert(true)
         );
-        // update du document dans la bdd
     }
 
     /**
-     * Permet de récupérer le document sous sa forme originale
-     * @return le document en question
+     * Allows to recover the document in its original form
+     * @return the document in question
      */
     public final Document getDocument () {
         return manager.collection.find(new Document(manager.fieldID, id)).first();
@@ -78,15 +78,15 @@ public final class Element {
 
 
     /**
-     * Permet de mettre à jour les données du document
-     * @param raw les données à modifier en Raw
+     * Allows to update the document data
+     * @param raw the data to modify from a structure
      */
     public final <D> void setRaw (final D raw) {
         try {
             final Document values = new Document(manager.fieldID, this.id) {{
                 for (final Field field : raw.getClass().getFields())
                     append(field.getName(), field.get(raw));
-                // définition du Document à partir du Raw
+                // We creating the Document object with reflection from raw
             }};
 
             manager.collection.updateOne(
@@ -94,7 +94,7 @@ public final class Element {
                     new Document("$set", values),
                     new UpdateOptions().upsert(true)
             );
-            // update du document dans la bdd
+            // and we can now update
 
         } catch (final Exception e) {
             e.printStackTrace();
@@ -102,22 +102,22 @@ public final class Element {
     }
 
     /**
-     * Permet de récupérer toute la structure d'un document
+     * Allows to retrieve the values of the document in the form of a chosen structure (non-existent fields will be ignored without causing an error)
      *
-     * @return structure de l'élément 'id' de l'instance
+     * @return the class structure
      */
     public final <D> D getRaw (final Class<D> structure) {
         final D res = manager.getEmptyRaw(structure);
         final Document doc = manager.collection.find(new Document(manager.fieldID, id)).first();
 
-        if (doc != null) { // check de sécurité si le document existe.
+        if (doc != null) { // if the document exist before,
             try {
                 for (final Field field : structure.getFields()) {
                     if (doc.containsKey(field.getName()))
                         field.set(res, doc.get(field.getName()));
-                    // importation des valeurs des fields du Raw vide
+                    // set fields values from document values
                 }
-            } catch (final Exception e) {
+            } catch (final IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -129,49 +129,47 @@ public final class Element {
 
 
     /**
-     * Permet d'update plusieurs fields
-     * d'un document grâce au formatage variadique
-     *
-     * @param values Les couples key/value à update
+     * Allows to update several fields of a document thanks to the variadic formatting
+     * @param values The key/value pairs at update
      */
     public final void update (final Object... values) {
         if (values.length % 2 == 0) {
-            // si 'values' est paire ( donc key->value )
+            // if the values are of even number ( so each key is linked to its value )
 
             final Document toModify = new Document() {{
                 for (int ind = 0; ind < values.length; ind += 2)
                     append(String.valueOf(values[ind]), values[ind + 1]);
+                    // we set the document from values given
             }};
 
             manager.collection.updateOne(
                     new Document(manager.fieldID, this.id),
                     new Document("$set", toModify)
             );
+            // and update
         }
     }
 
     /**
-     * Permet d'update plusieurs fields
-     * d'un document grâce à une Map
-     *
-     * @param values Les couples key/value à update
+     * Allows to update several fields of a document using a map
+     * @param values The key/value pairs at update
      */
     public final void update (final Map<String, Object> values) {
-        final Document toModify = new Document();
-
-        values.forEach(toModify::append);
+        final Document toModify = new Document(values);
+        // we set the document from values given
 
         manager.collection.updateOne(
                 new Document(manager.fieldID, this.id),
                 new Document("$set", toModify)
         );
+        // and update
     }
 
     /**
-     * Permet d'update un field seulement d'un document
+     * Allows to update a field only of a document
      *
-     * @param key nom du field
-     * @param value valeur du field
+     * @param key name of the field
+     * @param value value of the field
      */
     public final void update (final String key, final Object value) {
         manager.collection.updateOne(
@@ -184,14 +182,12 @@ public final class Element {
 
 
     /**
-     * Permet d'incrémenter [ou décrémenter] un field.
+     * Allows to increment [or decrement] a field.
      *
-     * La valeur négative aboutiera à une décrémentation.
+     * The negative value will result in a decrement.
      *
-     * @param key nom du field
-     * @param value valeur d'incrémentation,
-     *              peut être négatif pour
-     *              inverser pour une décrémentation
+     * @param key name of the field.
+     * @param value increment value, can be negative to reverse for a decrement
      */
     public final void increment (final String key, final Object value) {
         manager.collection.updateOne(
@@ -201,18 +197,14 @@ public final class Element {
     }
 
     /**
-     * Permet d'incrémenter [ou décrémenter] plusieurs fields en une requête
-     * Grâce a une Map<Str , Nb>
+     * Allows to increment [or decrement] several fields in a request thanks to a Map.
+     * Negative values will result in decrementations
      *
-     * Les valeurs négatifs aboutieront à des décrémentations
-     *
-     * @param values couple field / valeur [ incrémentation / décrémentation ]
+     * @param values field / value pair [increment / decrement]
      */
-    public final void increment (final Map<String, Number> values) {
+    public final void increment (final Map<String, Object> values) {
         if (values.size() > 0) {
-            final Document doc = new Document() {{
-                values.forEach(this::append);
-            }};
+            final Document doc = new Document(values);
 
             manager.collection.updateOne(
                     new Document(manager.fieldID, this.id),
@@ -222,19 +214,18 @@ public final class Element {
     }
 
     /**
-     * Permet d'incrémenter [ou décrémenter] plusieurs fields en une requête
-     * Grâce à un arg variadique.
+     * Allows to increment [or decrement] several fields in a query thanks to a variadic argument
      *
-     * Deux valeurs à la suite correspondent au couple
+     * Two consecutive values match a pair
      * key -> value
      *
-     * Les valeurs négatifs aboutieront à des décrémentations
+     * Negative values will result in decrementations
      *
-     * @param values couple field / valeur [ incrémentation / décrémentation ]
+     * @param values field / value pair [increment / decrement]
      */
     public final void increment (final Object... values) {
         if (values.length >= 2 && values.length%2 == 0) {
-            // si 'values' est paire ( donc key->value )
+            // if the values is of an even number ( so key->value )
 
             final Document toModify = new Document() {{
                 for (int ind=0; ind<values.length; ind+=2)
@@ -251,35 +242,35 @@ public final class Element {
     // _________________________________________________________________________________________________________________
 
     /**
-     * Permet d'ajouter des éléments à un array
-     * @param key le field étant un array
-     * @param values les valeurs à ajouter
+     * Allows you to add elements to an array
+     * @param key the field representing an array in the DB
+     * @param value the value to add
      */
-    public final void push (final String key, final Object values) {
+    public final void push (final String key, final Object value) {
         manager.collection.updateOne(
                 new Document(manager.fieldID, this.id),
-                new Document("$push", new Document(key, values)),
+                new Document("$push", new Document(key, value)),
                 new UpdateOptions().upsert(true)
         );
     }
 
     /**
-     * Permet d'ajouter des éléments à un array
-     * @param key le field étant un array
-     * @param values les documents à ajouter
+     * Allows to add a document to an array
+     * @param key the field representing an array in the DB
+     * @param value the document to add
      */
-    public final void push (final String key, final Document values) {
+    public final void push (final String key, final Document value) {
         manager.collection.updateOne(
                 new Document(manager.fieldID, this.id),
-                new Document("$push", new Document(key, new Document(values))),
+                new Document("$push", new Document(key, new Document(value))),
                 new UpdateOptions().upsert(true)
         );
     }
 
     /**
-     * Permet de retirer des éléments choisis d'un array
-     * @param key le field étant un array
-     * @param values les valeurs à retirer
+     * Allows you to remove a selected element from an array
+     * @param key the field representing an array in the DB
+     * @param values the value to remove
      */
     public final void pull (final String key, final Object values) {
         manager.collection.updateOne(
@@ -289,20 +280,20 @@ public final class Element {
     }
 
     /**
-     * Permet de retirer des documents choisis d'un array
-     * @param key le field étant un array
-     * @param values les documents à retirer
+     * Allows to remove a selected document from an array
+     * @param key the field representing an array in the DB
+     * @param value the document to remove
      */
-    public final void pull (final String key, final Document values) {
+    public final void pull (final String key, final Document value) {
         manager.collection.updateOne(
                 new Document(manager.fieldID, this.id),
-                new Document("$pull", new Document(key, values))
+                new Document("$pull", new Document(key, value))
         );
     }
 
     /**
-     * Permet de retirer tous les éléments d'un array
-     * @param key le field étant un array
+     * Allows you to remove all elements from an array
+     * @param key the field representing an array in the DB
      */
     public final void pullAll (final String key) {
         manager.collection.updateOne(
@@ -313,9 +304,9 @@ public final class Element {
 
 
     /**
-     * Permet de récupérer une liste à partir d'un field
-     * @param key field/key de la liste
-     * @return la liste demandée
+     * Allows you to retrieve a list from a field
+     * @param key the field representing an array in the DB
+     * @return the requested list
      */
        public final List<?> getList (final String key) {
           final Document resq = manager.collection.find(new Document(manager.fieldID, this.id)).first();
@@ -323,9 +314,9 @@ public final class Element {
       }
 
     /**
-     * Permet de récupérer une liste à partir d'un field
-     * @param key field/key de la liste
-     * @return la liste demandée
+     * Allows you to retrieve a list of String from a field
+     * @param key the field representing an array in the DB
+     * @return the requested list of type String
      */
      public final List<String> getStringList (final String key) {
           final Document resq = manager.collection.find(new Document(manager.fieldID, this.id)).first();
@@ -333,17 +324,20 @@ public final class Element {
       }
 
     /**
-     * Permet de récupérer les éléments d'une liste
-     * Sous forme de document
-     * @param key field/key de la liste
-     * @return la liste demandée
+     * Allows to retrieve documents from a list
+     * @param key the field representing an array in the DB
+     * @return the requested list of type document
      */
       public final List<Document> getListAsDocument (final String key) {
           final Document resq = manager.collection.find(new Document(manager.fieldID, this.id)).first();
           return (resq != null) ? resq.getList(key, Document.class) : new ArrayList<>();
       }
 
-
+    /**
+     * Allows to remove an element from a list by its index
+     * @param key the field representing an array in the DB
+     * @param index the index of the element concerned
+     */
     public final void pullIndex (final String key, final int index) {
         manager.collection.updateOne(
                 new Document(manager.fieldID, this.id),

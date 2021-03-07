@@ -56,6 +56,7 @@ public class TestFastMongo {
             // default schema
         }};
 
+
         // getting a document where _id equals "Hello"
         Element a = man.getObject("Hello");
         Element b = man.getObject("Hey");
