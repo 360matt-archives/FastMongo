@@ -5,6 +5,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import fr.i360matt.fastmongo.utils.ExpirableCache;
 import org.bson.Document;
 import java.util.Collections;
 
