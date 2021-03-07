@@ -1,4 +1,4 @@
-package fr.i360matt.fastmongo;
+package fr.i360matt.fastmongo.utils;
 
 
 import java.util.Date;
