@@ -3,12 +3,18 @@
 Being able to manipulate documents in the form of a personalized structure thanks to reflection.  
 Create any class, add as many fields to it as you want, set defaults to whatever you want, and you can finally use it to fetch and define documents. 
 
-### Why use this API ?
+### :interrobang: Why use this API ?
 * :bulb: As simple as possible, it is easy to learn
 * :hourglass: Its use is very fast, even the migration
 * :art: It is customizable, you can define many behavior in this API
 * :floppy_disk: Your data is better structured
 * :vertical_traffic_light: You can develop your project and your structure
+* :recycle: Very light, my code represents only 17 KB 
+
+### :link: Dependencies:
+* I only use the official Mongo driver in the latest version (3.12.8)
+* For my first tests, I was using Fongo to emulate a Mongo server, but lastly I tested with a real production server.  
+:warning: Fongo does not really work above 3.5.X excluded 
 
 
 ## :star: Beginning:
