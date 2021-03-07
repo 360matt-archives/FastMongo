@@ -84,14 +84,15 @@ You can sort multiple fields:
 Sort currentSort = man.buildSort("price", "age");
 // ascending sort
 
-Sort currentSort = man.buildSort(Sort.Direction.DESCENDING, "price", "age");
-// descending sort
 
 
-
-currentSort.setRule(Sort.Direction.ASCENDING, "one", "two", "three"); // ascending sort
-currentSort.setRule(Sort.Direction.DESCENDING, "one", "two", "three"); // descending sort
+Sort currentSort = man.buildSort(); // nothing in constructor
 // It is possible to add classification rules after instantiation
+
+
+currentSort.descending("disease", "etc ...");
+currentSort.ascending("price", "age");
+// create an empty pattern and add ascending/descending criteria ad infinitum 
 
 
 List<Kangourou> topPriceWithBetterAge = currentSort.getRaws(Kangourou.class);
