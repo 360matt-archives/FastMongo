@@ -230,7 +230,7 @@ element.id
 ```
 
 ## :innocent: For more help:
-* Here the Javadoc you can download: https://github.com/360matt/FastMongo/blob/master/javadoc  
+* Here the Javadoc you can download: https://github.com/360matt/FastMongo/blob/master/javadoc_en  
 * You can also add me on Discord: Matteow#6953
 
 ### :ghost: About Me:
