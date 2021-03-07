@@ -13,41 +13,27 @@ public class CollectionManager {
     /**
      * Permet de récupérer le manager de la collection dans le cache
      * @param name nom de la collection
-     * @param providedParams paramètres du manager
      * @return le manager concerné
      */
-    public static CollectionManager getCollection (final String name, final CollectParams providedParams) {
+    public static CollectionManager getCollection (final String name) {
         if (MongoIntegration.collectionCache.containsKey(name)) {
             return MongoIntegration.collectionCache.get(name);
         } else {
-            return new CollectionManager(name, providedParams);
+            return new CollectionManager(name);
             // s'ajoutera au cache à l'instanciation [*]
         }
     }
 
-    /**
-     * Permet de récupérer le manager de la collection dans le cache
-     * @param name nom de la collection
-     * @return le manager concerné
-     */
-    public static CollectionManager getCollection (final String name) {
-        return getCollection(name, new CollectParams());
-    }
-
 
     public final String name;
+    public String fieldID;
     public final MongoCollection<Document> collection;
-    public CollectParams settings;
 
     public Class<?> defaultTemplate;
     public Document defaultDocument;
     public boolean autoInsert;
 
     public CollectionManager (final String name) {
-        this(name, new CollectParams());
-    }
-
-    public CollectionManager (final String name, final CollectParams params) {
         this.name = name;
 
         final CollectionManager candidate = MongoIntegration.collectionCache.get(name);
@@ -55,13 +41,11 @@ public class CollectionManager {
             // si la collection est déjà dans le cache
 
             this.collection = candidate.collection;
-            this.settings = candidate.settings;
         } else {
             if (!MongoIntegration.existCollect(name))
                 MongoIntegration.createCollect(name);
 
             this.collection = MongoIntegration.getCollect(name);
-            this.settings = params;
 
             // ajout au cache statique: [*]
             MongoIntegration.collectionCache.put(name, this);
@@ -101,14 +85,14 @@ public class CollectionManager {
     }
 
     /**
-     * Permet de définir des options
-     * @param params options
-     * @return instance de ce manager
+     * Permet de changer le nom du field qui sert d'identifiant
+     * Exemple: UUID, username, etc...
+     * @param id le nom du field
      */
-    public final CollectionManager setOptions (final CollectParams params) {
-        this.settings = params;
-        return this;
+    public final void setFieldID (final String id) {
+        this.fieldID = id;
     }
+
 
     /**
      * Permet de récupérer les données par défauts de la structure choisie
@@ -167,7 +151,7 @@ public class CollectionManager {
      * @return l'état de l'existence
      */
     public final boolean exist (final String id) {
-        return collection.count(new Document("_id", id)) > 0;
+        return collection.count(new Document(this.fieldID, id)) > 0;
     }
 
     /**
@@ -175,7 +159,7 @@ public class CollectionManager {
      * @param id identifiant de l'élément
      */
     public final void remove (final String id) {
-        collection.deleteOne(new Document("_id", id));
+        collection.deleteOne(new Document(this.fieldID, id));
     }
 
 
