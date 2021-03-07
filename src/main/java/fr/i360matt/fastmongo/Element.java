@@ -32,12 +32,12 @@ public final class Element {
      */
     protected final void defineDefaultSchema () {
         if (manager.autoInsert && manager.defaultDocument != null) {
-            // if (collection.count(new Document("_id", id)) == 0) {
+            // if (collection.count(new Document(manager.fieldID, id)) == 0) {
             // si le document n'existe pas dans la collection
 
             try {
                 manager.collection.updateOne(
-                        new Document("_id", this.id),
+                        new Document(manager.fieldID, this.id),
                         new Document("$setOnInsert", manager.defaultDocument),
                         new UpdateOptions().upsert(true)
                 );
@@ -58,7 +58,7 @@ public final class Element {
      */
     public final void setDocument (final Document document) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$set", document),
                 new UpdateOptions().upsert(true)
         );
@@ -70,7 +70,7 @@ public final class Element {
      * @return le document en question
      */
     public final Document getDocument () {
-        return manager.collection.find(new Document("_id", id)).first();
+        return manager.collection.find(new Document(manager.fieldID, id)).first();
     }
 
 
@@ -83,14 +83,14 @@ public final class Element {
      */
     public final <D> void setRaw (final D raw) {
         try {
-            final Document values = new Document("_id", this.id) {{
+            final Document values = new Document(manager.fieldID, this.id) {{
                 for (final Field field : raw.getClass().getFields())
                     append(field.getName(), field.get(raw));
                 // définition du Document à partir du Raw
             }};
 
             manager.collection.updateOne(
-                    new Document("_id", this.id),
+                    new Document(manager.fieldID, this.id),
                     new Document("$set", values),
                     new UpdateOptions().upsert(true)
             );
@@ -108,7 +108,7 @@ public final class Element {
      */
     public final <D> D getRaw (final Class<D> structure) {
         final D res = manager.getEmptyRaw(structure);
-        final Document doc = manager.collection.find(new Document("_id", id)).first();
+        final Document doc = manager.collection.find(new Document(manager.fieldID, id)).first();
 
         if (doc != null) { // check de sécurité si le document existe.
             try {
@@ -144,7 +144,7 @@ public final class Element {
             }};
 
             manager.collection.updateOne(
-                    new Document("_id", this.id),
+                    new Document(manager.fieldID, this.id),
                     new Document("$set", toModify)
             );
         }
@@ -162,7 +162,7 @@ public final class Element {
         values.forEach(toModify::append);
 
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$set", toModify)
         );
     }
@@ -175,7 +175,7 @@ public final class Element {
      */
     public final void update (final String key, final Object value) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$set", new Document(key, value))
         );
     }
@@ -195,7 +195,7 @@ public final class Element {
      */
     public final void increment (final String key, final Object value) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$inc", new Document(key, value))
         );
     }
@@ -215,7 +215,7 @@ public final class Element {
             }};
 
             manager.collection.updateOne(
-                    new Document("_id", this.id),
+                    new Document(manager.fieldID, this.id),
                     new Document("$inc", doc)
             );
         }
@@ -242,7 +242,7 @@ public final class Element {
             }};
 
             manager.collection.updateOne(
-                    new Document("_id", this.id),
+                    new Document(manager.fieldID, this.id),
                     new Document("$inc", toModify)
             );
         }
@@ -257,7 +257,7 @@ public final class Element {
      */
     public final void push (final String key, final Object values) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$push", new Document(key, values)),
                 new UpdateOptions().upsert(true)
         );
@@ -270,7 +270,7 @@ public final class Element {
      */
     public final void push (final String key, final Document values) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$push", new Document(key, new Document(values))),
                 new UpdateOptions().upsert(true)
         );
@@ -283,7 +283,7 @@ public final class Element {
      */
     public final void pull (final String key, final Object values) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$pull", new Document(key, values))
         );
     }
@@ -295,7 +295,7 @@ public final class Element {
      */
     public final void pull (final String key, final Document values) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$pull", new Document(key, values))
         );
     }
@@ -306,7 +306,7 @@ public final class Element {
      */
     public final void pullAll (final String key) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$set", new Document(key, "[]"))
         );
     }
@@ -318,7 +318,7 @@ public final class Element {
      * @return la liste demandée
      */
        public final List<?> getList (final String key) {
-          final Document resq = manager.collection.find(new Document("_id", this.id)).first();
+          final Document resq = manager.collection.find(new Document(manager.fieldID, this.id)).first();
           return (resq != null) ? (ArrayList<?>) resq.getList(key, Object.class) : new ArrayList<>();
       }
 
@@ -328,7 +328,7 @@ public final class Element {
      * @return la liste demandée
      */
      public final List<String> getStringList (final String key) {
-          final Document resq = manager.collection.find(new Document("_id", this.id)).first();
+          final Document resq = manager.collection.find(new Document(manager.fieldID, this.id)).first();
           return (resq != null) ? resq.getList(key, String.class) : new ArrayList<>();
       }
 
@@ -339,19 +339,19 @@ public final class Element {
      * @return la liste demandée
      */
       public final List<Document> getListAsDocument (final String key) {
-          final Document resq = manager.collection.find(new Document("_id", this.id)).first();
+          final Document resq = manager.collection.find(new Document(manager.fieldID, this.id)).first();
           return (resq != null) ? resq.getList(key, Document.class) : new ArrayList<>();
       }
 
 
     public final void pullIndex (final String key, final int index) {
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$unset", new Document(key + "." + index, 1))
         );
 
         manager.collection.updateOne(
-                new Document("_id", this.id),
+                new Document(manager.fieldID, this.id),
                 new Document("$pull", new Document(key, null))
         );
     }
