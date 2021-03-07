@@ -82,15 +82,15 @@ List<Document> topPrice = man.buildSort("price")
 You can sort multiple fields:
 ```java
 Sort currentSort = man.buildSort("price", "age");
-// croissant sort
+// ascending sort
 
-Sort currentSort = man.buildSort(Sort.Direction.DECROISSANT, "price", "age");
-// decroissant sort
+Sort currentSort = man.buildSort(Sort.Direction.DESCENDING, "price", "age");
+// descending sort
 
 
 
-currentSort.setRule(Sort.Direction.CROISSANT, "one", "two", "three"); // croissant sort
-currentSort.setRule(Sort.Direction.DECROISSANT, "one", "two", "three"); // decroissant sort
+currentSort.setRule(Sort.Direction.ASCENDING, "one", "two", "three"); // ascending sort
+currentSort.setRule(Sort.Direction.DESCENDING, "one", "two", "three"); // descending sort
 // It is possible to add classification rules after instantiation
 
 
