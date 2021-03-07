@@ -14,7 +14,7 @@ import java.util.List;
  */
 public final class Sort {
     public enum Direction {
-        CROISSANT, DECROISSANT
+        ASCENDING, DESCENDING
     }
 
     private FindIterable<Document> iter;
@@ -37,7 +37,7 @@ public final class Sort {
     }
 
     public final Sort setRule (final Direction direction, final String... fields) {
-        final Bson choice = (direction.equals(Direction.CROISSANT)) ? Sorts.ascending(fields) : Sorts.descending(fields);
+        final Bson choice = (direction.equals(Direction.ASCENDING)) ? Sorts.ascending(fields) : Sorts.descending(fields);
         this.iter = (this.iter == null) ? manager.collection.find().sort(choice) : this.iter.sort(choice);
         return this;
     }
