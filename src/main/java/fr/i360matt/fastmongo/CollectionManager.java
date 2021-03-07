@@ -26,7 +26,7 @@ public class CollectionManager {
 
 
     public final String name;
-    public String fieldID;
+    public String fieldID = "_id";
     public final MongoCollection<Document> collection;
 
     public Class<?> defaultTemplate;
