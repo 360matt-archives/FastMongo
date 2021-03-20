@@ -20,13 +20,13 @@ Create any class, add as many fields to it as you want, set defaults to whatever
 ## :star: Beginning:
 1. You must define the connection to the database:
 ```java
-MongoIntegration.connect(new MongoIntegration.Auth() {
+MongoIntegration.connect(new MongoIntegration.Auth() {{
         this.host = ;
         this.port = ;
         this.user = ;
         this.password = ;
         this.database = ;
-});
+}});
 ```
 2. If at any time you want to close the connection:
 ```java
@@ -46,7 +46,7 @@ Element#getDocument() // get legacy document of Element
 * The collection is created in the DB each time CollectionManager is instantiated
 ```java
  // getting Collection manager
-CollectionManager man = new CollectionManager("collection name") {
+CollectionManager man = new CollectionManager("collection name") {{
 
         updateStructure(Kangourou.class);
         // Optional: allows you to define new fields without deleting old ones from all existing documents 
@@ -57,7 +57,7 @@ CollectionManager man = new CollectionManager("collection name") {
         setFieldID("UUID");
         // Optional: By default, IDs are mapped by the field _id, but you can use any other field name 
         
-};
+}};
 ```
 
 ### :hammer: Features:
@@ -139,9 +139,9 @@ Those which are not present in the structure but present in the document will be
 
 :information_source: You can also change name/id of document
 ```java
-element.setRaw(new Kangourou() {
+element.setRaw(new Kangourou() {{
   this.anyField = "newer value";
-});
+}});
 ```
 * Update document without structures:
 ```java
@@ -154,9 +154,9 @@ element.update(
 );
 // update multiples keys with variadic
 
-element.update( new HashMap() {
+element.update( new HashMap() {{
   put("key", "value");
-});
+}});
 // update with hashmap
 ```
 * Increment / Decrement one or multiple fields:
@@ -173,9 +173,9 @@ element.increment(
 )
 // [in/de]crement multiple fields
 
-element.increment(new HashMap() {
+element.increment(new HashMap() {{
   put("key", 3);
-});
+}});
 // will do +3
 ```
 * Get legacy document:
