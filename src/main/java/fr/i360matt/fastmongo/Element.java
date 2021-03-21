@@ -25,8 +25,8 @@ public final class Element {
         this.id = id;
         this.manager = manager;
 
-        if (!MongoIntegration.cache.containsKey(id)) {
-            MongoIntegration.cache.put(manager.name + "#" + id, false);
+        if (!MongoIntegration.cache.contains(id)) {
+            MongoIntegration.cache.add(manager.name + "#" + id);
             defineDefaultSchema();
         }
     }
