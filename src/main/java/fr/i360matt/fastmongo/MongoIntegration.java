@@ -6,6 +6,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import fr.i360matt.fastmongo.utils.ExpirableCache;
+import fr.i360matt.fastmongo.utils.ExpirableCacheList;
 import org.bson.Document;
 import java.util.Collections;
 
@@ -15,7 +16,7 @@ import java.util.Collections;
  */
 public final class MongoIntegration {
 
-    protected static final ExpirableCache<String, Boolean> cache = new ExpirableCache<>(1_000);
+    protected static final ExpirableCacheList<String> cache = new ExpirableCacheList<>(1_000);
     protected static final ExpirableCache<Class<?>, Object> typeCache = new ExpirableCache<>(10_000);
     protected static final ExpirableCache<String, CollectionManager> collectionCache = new ExpirableCache<>(3600_000);
 
@@ -52,7 +53,7 @@ public final class MongoIntegration {
         );
 
         database = client.getDatabase(auth.database);
-        setAvailable(true);
+        isAvailable = true;
     }
 
     /**
@@ -60,7 +61,7 @@ public final class MongoIntegration {
      */
     public static void disconnect () {
         client.close();
-        setAvailable(false);
+        isAvailable = false;
     }
 
 
