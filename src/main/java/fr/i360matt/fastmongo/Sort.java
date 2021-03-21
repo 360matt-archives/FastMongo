@@ -5,6 +5,7 @@ import com.mongodb.client.model.Sorts;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * This class is used to classify a Document in relation to one or more fields
  * @author 360matt
  */
-public final class Sort {
+public final class Sort implements Closeable {
     public enum Direction {
         ASCENDING, DESCENDING
     }
@@ -72,14 +73,19 @@ public final class Sort {
     public final List<Document> getDocuments () {
         final List<Document> res = new ArrayList<>();
         getIterable().iterator().forEachRemaining(res::add);
+        close();
         return res;
     }
 
     public final <D> List<D> getRaws (final Class<D> structure) {
         final List<D> res = new ArrayList<>();
         getIterable().iterator().forEachRemaining(x -> res.add(manager.getRawFromDocument(x, structure)));
+        close();
         return res;
     }
 
+    public void close () {
+        iter = null;
+    }
 
 }
