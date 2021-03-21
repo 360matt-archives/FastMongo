@@ -65,15 +65,6 @@ public class ExpirableCache<K, V> extends ConcurrentHashMap<K, V> {
         executor.scheduleAtFixedRate(() -> {
             final long currentTime = System.currentTimeMillis();
 
-            /*
-            for (final Entry<K, Long> entry  : timeMap.entrySet()) {
-                if (currentTime > (entry.getValue() + expiryInMillis)) {
-                    remove(entry.getKey());
-                    timeMap.remove(entry.getKey());
-                }
-            }
-             */
-
             final Iterator<Entry<K, Long>> iter = timeMap.entrySet().iterator();
             while (iter.hasNext()) {
                 final Entry<K, Long> entry = iter.next();
