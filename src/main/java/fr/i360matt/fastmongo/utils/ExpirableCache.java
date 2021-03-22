@@ -48,16 +48,19 @@ public class ExpirableCache<K, V> extends ConcurrentHashMap<K, V> {
 
     @Override
     public final void putAll (final Map<? extends K, ? extends V> m) {
+        long time = System.currentTimeMillis();
         for (final Entry<? extends K, ? extends V> entry : m.entrySet()) {
+            timeMap.put(entry.getKey(), time);
             put(entry.getKey(), entry.getValue());
         }
     }
 
     @Override
     public final V putIfAbsent(final K key, final V value) {
-        if (!containsKey(key))
+        if (!containsKey(key)) {
+            timeMap.put(key, System.currentTimeMillis());
             return put(key, value);
-        else
+        } else
             return get(key);
     }
 
