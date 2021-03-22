@@ -1,6 +1,7 @@
 package fr.i360matt.fastmongo;
 
 import com.mongodb.client.MongoCollection;
+import fr.i360matt.fastmongo.utils.ExpirableCache;
 import org.bson.Document;
 import java.lang.reflect.Field;
 
@@ -10,14 +11,17 @@ import java.lang.reflect.Field;
  */
 public class CollectionManager {
 
+    protected static final ExpirableCache<Class<?>, Object> typeCache = new ExpirableCache<>(10_000);
+    protected static final ExpirableCache<String, CollectionManager> collectionCache = new ExpirableCache<>(3600_000);
+
     /**
      * Allows to retrieve the manager of the collection in the cache
      * @param name name of the collection
      * @return the manager concerned
      */
     public static CollectionManager getCollection (final String name) {
-        if (MongoIntegration.collectionCache.containsKey(name)) {
-            return MongoIntegration.collectionCache.get(name);
+        if (collectionCache.containsKey(name)) {
+            return collectionCache.get(name);
         } else {
             return new CollectionManager(name);
             // will be added to the cache at instantiation  [*]
@@ -36,7 +40,7 @@ public class CollectionManager {
     public CollectionManager (final String name) {
         this.name = name;
 
-        final CollectionManager candidate = MongoIntegration.collectionCache.get(name);
+        final CollectionManager candidate = collectionCache.get(name);
         if (candidate != null) {
             // if the collection is already in the cache
 
@@ -48,7 +52,7 @@ public class CollectionManager {
             this.collection = MongoIntegration.getCollect(name);
 
             // add to static cache: [*]
-            MongoIntegration.collectionCache.put(name, this);
+            collectionCache.put(name, this);
         }
     }
 
@@ -61,7 +65,7 @@ public class CollectionManager {
         final Document doc = new Document();
 
         for (final Field field : structure.getFields()) {
-            doc.append(field.getName(), MongoIntegration.typeCache.get(structure));
+            doc.append(field.getName(), typeCache.get(structure));
 
             collection.updateMany(
                     new Document(field.getName(), new Document("$exists", false)), // patern: [ 'field' don't exist ]
@@ -80,7 +84,7 @@ public class CollectionManager {
         this.defaultDocument = new Document();
 
         for (final Field field : structure.getFields()) {
-            this.defaultDocument.append(field.getName(), MongoIntegration.typeCache.get(structure));
+            this.defaultDocument.append(field.getName(), typeCache.get(structure));
         }
     }
 
@@ -101,16 +105,16 @@ public class CollectionManager {
      * @return the default data of the structure (instance)
      */
     public final <D> D getEmptyRaw (final Class<D> structure) {
-        if (!MongoIntegration.typeCache.containsKey(structure)) {
+        if (!typeCache.containsKey(structure)) {
             try {
                 final D res = structure.newInstance();
-                MongoIntegration.typeCache.put(structure, res);
+                typeCache.put(structure, res);
                 return res;
             } catch (InstantiationException | IllegalAccessException e) {
                 return null;
             }
         }
-        return (D) MongoIntegration.typeCache.get(structure);
+        return (D) typeCache.get(structure);
     }
 
 
@@ -130,7 +134,7 @@ public class CollectionManager {
                 }
             }
             return res;
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }

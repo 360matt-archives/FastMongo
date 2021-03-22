@@ -1,6 +1,7 @@
 package fr.i360matt.fastmongo;
 
 import com.mongodb.client.model.UpdateOptions;
+import fr.i360matt.fastmongo.utils.ExpirableCacheList;
 import org.bson.Document;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.Map;
  * @author 360matt
  */
 public final class Element {
+
+    protected static final ExpirableCacheList<String> cache = new ExpirableCacheList<>(1_000);
 
     public final String id;
     public final CollectionManager manager;
@@ -25,8 +28,8 @@ public final class Element {
         this.id = id;
         this.manager = manager;
 
-        if (!MongoIntegration.cache.contains(id)) {
-            MongoIntegration.cache.add(manager.name + "#" + id);
+        if (!cache.contains(id)) {
+            cache.add(manager.name + "#" + id);
             defineDefaultSchema();
         }
     }
